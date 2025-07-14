@@ -21,34 +21,29 @@ function generateSHA256Hash(inputString) {
 
 // Fungsi untuk validasi lisensi
 async function validateLicense() {
+  console.log("[VALIDASI] Memulai validasi lisensi...");
+
   try {
-    // Cari semua lisensi aktif untuk domain ini dari Firestore
     const q = query(
       collection(db, "licenses"),
+      where("blogId", "==", blogId),
       where("domain", "==", domain),
-      where("status", "==", "aktif")
+      where("additionalWord", "==", kataKunci),
+      where("licenseCode", "==", generatedLicense)
     );
+
     const snapshot = await getDocs(q);
+    const isValidFromFirestore = !snapshot.empty;
+    const isValidFromWidget = (inputLicenseFromWidget === generatedLicense);
 
-    if (snapshot.empty) throw new Error("Tidak ditemukan lisensi aktif untuk domain ini");
+    console.log(`[VALIDASI] Domain: ${domain}`);
+    console.log(`[VALIDASI] Lisensi valid di Firestore?`, isValidFromFirestore);
+    console.log(`[VALIDASI] Lisensi cocok dengan widget?`, isValidFromWidget);
 
-    let isValid = false;
-
-    snapshot.forEach(doc => {
-      const data = doc.data();
-      const generatedHash = generateSHA256Hash(data.blogId + domain + data.additionalWord);
-
-      if (
-        inputLicenseFromWidget === generatedHash ||
-        data.licenseCode === generatedHash
-      ) {
-        isValid = true;
-      }
-    });
-
-    if (isValid) {
-      console.log("✅ Lisensi valid untuk domain:", domain);
+    if (isValidFromFirestore || isValidFromWidget) {
+      console.log("✅ Lisensi valid, website berjalan normal.");
     } else {
+      console.warn("❌ Lisensi tidak ditemukan, memblokir akses.");
       document.body.innerHTML = `
         <style>
           #peringatan{position:fixed;top:0;left:0;right:0;bottom:0;background:#000;color:#fff;padding:30px;text-align:center;z-index:9999;display:flex;flex-direction:column;justify-content:center;align-items:center;font-family:monospace}
@@ -56,12 +51,11 @@ async function validateLicense() {
         </style>
         <div id="peringatan">
           <h1>⚠️ Template Belum Diaktifkan</h1>
-          <p>Lisensi tidak cocok atau belum dimasukkan.</p>
+          <p>Lisensi untuk domain ini tidak ditemukan.</p>
           <span>${domain}</span>
           <small>Hubungi admin untuk mendapatkan lisensi resmi.</small>
         </div>`;
     }
-
   } catch (error) {
     console.error("🔥 Error saat validasi lisensi:", error);
     document.body.innerHTML = `<div style="padding:30px;font-family:monospace;color:#fff;background:#000">Terjadi kesalahan validasi lisensi. Coba refresh atau hubungi admin.</div>`;
