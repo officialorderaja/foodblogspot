@@ -25,6 +25,72 @@
       alert('Gagal memverifikasi lisensi.');
       document.body.innerHTML = '<h2 style="color:red;text-align:center;margin-top:100px;">KONEKSI GAGAL</h2>';
     });
+
+    function showLicenseError(message) {
+      document.body.innerHTML = `
+        <style>
+          body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', sans-serif;
+            background: #f7f7f7;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            color: #333;
+          }
+          .error-container {
+            background: white;
+            border: 1px solid #ddd;
+            padding: 30px;
+            max-width: 500px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            border-radius: 12px;
+          }
+          .error-container h1 {
+            color: #c0392b;
+            font-size: 24px;
+            margin-bottom: 10px;
+          }
+          .error-container p {
+            font-size: 16px;
+            margin-bottom: 20px;
+          }
+          .countdown {
+            font-size: 14px;
+            color: #888;
+          }
+          .wa-btn {
+            display: inline-block;
+            margin-top: 15px;
+            padding: 10px 18px;
+            background: #25D366;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            font-weight: bold;
+          }
+        </style>
+        <div class="error-container">
+          <h1>⚠️ Akses Ditolak</h1>
+          <p>${message}</p>
+          <div class="countdown">Mengalihkan ke WhatsApp dalam <span id="counter">5</span> detik...</div>
+          <a class="wa-btn" href="https://wa.me/6281234567890?text=Halo,%20saya%20mau%20aktivasi%20template" target="_blank">Hubungi Sekarang</a>
+        </div>
+      `;
+
+      let counter = 5;
+      const interval = setInterval(() => {
+        counter--;
+        document.getElementById("counter").innerText = counter;
+        if (counter === 0) {
+          clearInterval(interval);
+          window.location.href = "https://wa.me/6281234567890?text=Halo,%20saya%20mau%20aktivasi%20template";
+        }
+      }, 1000);
+    }
   });
 
 var JSON;
