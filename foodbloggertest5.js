@@ -15,8 +15,8 @@
 
     const db = firebase.firestore();
 
-    db.collection('lisensi').doc(licenseHash).get().then(function (doc) {
-      if (!doc.exists || !doc.data().aktif) {
+    db.collection('licenses').doc(licenseHash).get().then(function (doc) {
+      if (!doc.exists || doc.data().status !== 'aktif') { 
         showLicenseError('Lisensi tidak valid atau belum diaktifkan.');
       } else {
         console.log('✅ Lisensi valid.');
