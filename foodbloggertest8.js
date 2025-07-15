@@ -14,9 +14,7 @@
   }
 
   const db = firebase.firestore();
-  const currentDomain = window.location.hostname.replace(/^www\./, '');
-  const blogId = window?._WidgetManager?.data?.blog?.blogId || "";
-
+  
   db.collection('licenses')
     .where("licenseCode", "==", licenseHash)
     .get()
@@ -28,6 +26,13 @@
 
       const doc = querySnapshot.docs[0];
       const data = doc.data();
+     const currentDomain = window.location.hostname.replace(/^www\./, '').toLowerCase();
+  const blogId = window._WidgetManager?.data?.blog?.blogId?.toString();
+
+     console.log("✔️ Lisensi ditemukan:");
+  console.log("→ Data Firestore:", data);
+  console.log("→ Domain saat ini:", currentDomain);
+  console.log("→ Blog ID saat ini:", blogId);
 
       if (data.status !== "aktif") {
         showLicenseError("Lisensi belum aktif.");
